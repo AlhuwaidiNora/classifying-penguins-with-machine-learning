@@ -1,0 +1,87 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+
+# Load the dataset
+penguins = pd.read_csv('data/penguins.csv')
+
+# Display the first few rows of the dataset
+print(penguins.head())
+
+# Plot distribution of flipper length by species
+plt.figure(figsize=(10, 6))
+sns.histplot(data=penguins, x='flipper_length_mm', hue='species', multiple='stack', bins=30)
+plt.title('Distribution of Flipper Length by Species')
+plt.xlabel('Flipper Length (mm)')
+plt.ylabel('Count')
+plt.show()
+
+# Plot distribution of body mass by species
+plt.figure(figsize=(10, 6))
+sns.histplot(data=penguins, x='body_mass_g', hue='species', multiple='stack', bins=30)
+plt.title('Distribution of Body Mass by Species')
+plt.xlabel('Body Mass (g)')
+plt.ylabel('Count')
+plt.show()
+
+# Scatterplot of bill length vs bill depth
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=penguins, x='culmen_length_mm', y='culmen_depth_mm', hue='species')
+plt.title('Bill Length vs Bill Depth')
+plt.xlabel('Bill Length (mm)')
+plt.ylabel('Bill Depth (mm)')
+plt.show()
+
+# Prepare features and labels
+X = penguins.drop(columns=['species', 'sex'])
+y = penguins['species']
+
+# Convert categorical features to one-hot encoding
+X = pd.get_dummies(X, columns=['island'], drop_first=True)
+X = pd.get_dummies(X, columns=['sex'], drop_first=True)
+
+# Display the processed data
+print(X.head())
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize the models
+logreg = LogisticRegression(max_iter=1000)
+knn = KNeighborsClassifier()
+svm = SVC()
+decision_tree = DecisionTreeClassifier()
+
+# Train the models
+logreg.fit(X_train, y_train)
+knn.fit(X_train, y_train)
+svm.fit(X_train, y_train)
+decision_tree.fit(X_train, y_train)
+
+# Predict and evaluate Logistic Regression model
+y_pred_logreg = logreg.predict(X_test)
+accuracy_logreg = accuracy_score(y_test, y_pred_logreg)
+
+# Predict and evaluate K-Nearest Neighbors model
+y_pred_knn = knn.predict(X_test)
+accuracy_knn = accuracy_score(y_test, y_pred_knn)
+
+# Predict and evaluate Support Vector Machine model
+y_pred_svm = svm.predict(X_test)
+accuracy_svm = accuracy_score(y_test, y_pred_svm)
+
+# Predict and evaluate Decision Tree model
+y_pred_tree = decision_tree.predict(X_test)
+accuracy_tree = accuracy_score(y_test, y_pred_tree)
+
+# Display the accuracy scores
+print(f'Logistic Regression Accuracy: {accuracy_logreg:.2f}')
+print(f'K-Nearest Neighbors Accuracy: {accuracy_knn:.2f}')
+print(f'Support Vector Machine Accuracy: {accuracy_svm:.2f}')
+print(f'Decision Tree Accuracy: {accuracy_tree:.2f}')
